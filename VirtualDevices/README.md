@@ -8,7 +8,10 @@ when they crash, power down, or just generally stop sending events, I want them 
 
 An example is a sensor that sends the RSSI for a bluetooth fob, when it's sending I'm home, when I'm not home there's no RSSI, so it doesn't send.
 
-Another example is a motion sensor that only sends when there is motion, and simply powers down when there isn't.. it doesn't send an "inactive" message!
+Another example is a motion sensor that only sends when there is motion, and simply powers down when there isn't, it never sends an "inactive" message!
+
+And finally I have a number of services running on my RaspberryPi, I'd like to know when they crash. 
+
 
 ## VirtualHeartbeatPresence
 This driver is a simple Presence Sensor that when not updated for a while automatically change to the selected state.
