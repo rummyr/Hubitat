@@ -16,7 +16,10 @@
  *
  */
 
-
+version = "1.1"
+private getVersion() {
+	"Virtual Heartbeat Presence " & version
+}
 
 metadata {
 
@@ -37,16 +40,14 @@ metadata {
 		// description("Simulates a presence sensor which is kept alive by receiving events. After a delay it will automatically change to present/not present")
 		input(name: "Comment", type: "text", title:"Simulates a presence sensor which is kept alive by receiving events. After a delay it will automatically change to present/not present",
 			  required: false, defaultValue:"")
-	 	input(name: "defaultState", type: "enum", title: "State to go to after the delay.<br />\n*Save* to see extra options", required:false,  defaultValue: "",
-			  options: ["keep last state", "present", "not present" ])          
+	 	input(name: "defaultState", type: "enum", title: "State to go to after the delay.", required:false,  defaultValue: "",
+			  options: ["keep last state", "present", "not present" ],
+			 submitOnChange: true)          
 	
-		//section	{
-		if(defaultState == "present" || defaultState == "not present"){
-				input(name: "delayNum", type: "number", title:"Delay before present/not present", required: true, defaultValue: 0)
-				input(name: "minSec", type: "bool", title: "Off = Seconds - On = Minutes", required: true, defaultValue: false)
-		}
-		//}
-	 	input(name: "debugEnabled", type: "bool", title: "Enable debug logging", required:true,  defaultValue: false)          
+		input(name: "secMin", type: "enum", title: "Seconds Or Minutes", required: true, defaultValue: "Seconds",
+			 options: ["Seconds", "minutes"])
+		input(name: "delayNum", type: "number", title:"Delay before present/not present", required: true, defaultValue: 62)
+		input(name: "debugEnabled", type: "bool", title: "Enable debug logging", required:true,  defaultValue: false)
 		}
 	} // end preferences
 } // end metadata
@@ -80,7 +81,7 @@ def removeLegacyState() {
 }
 
 def checkDelay(){
-    if (minSec == true) {
+    if (secMin == "Minutes") {
        state.delay1 = 60 * delayNum as int    
     }
     else{
@@ -94,10 +95,5 @@ private dbCleanUp() {
 	unschedule()
 	state.remove("PresenceSensor")
 	state.remove("presenceSensor")
-}
-
-
-private getVersion() {
-	"Virtual Heartbeat Presence 1.0"
 }
 

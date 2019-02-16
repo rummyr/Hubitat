@@ -16,7 +16,10 @@
  *
  */
 
-
+version = "1.1"
+private getVersion() {
+	"Virtual Heartbeat Motion Sensor " & version
+}
 
 metadata {
 
@@ -37,15 +40,12 @@ metadata {
 		// description("Simulates a presence sensor which is kept alive by receiving events. After a delay it will automatically change to present/not present")
 		input(name: "Comment", type: "text", title:"Simulates a motion sensor which is kept alive by receiving events. After a delay it will automatically change to active/inactive",
 			  required: false, defaultValue:"")
-	 	input(name: "defaultState", type: "enum", title: "State to go to after the delay.<br />\n*Save* to see extra options", required:false,  defaultValue: "",
+	 	input(name: "defaultState", type: "enum", title: "State to go to after the delay.", required:false,  defaultValue: "",
 			  options: ["keep last state", "active", "inactive" ])          
 	
-		//section	{
-		if(defaultState == "active" || defaultState == "inactive"){
-				input(name: "delayNum", type: "number", title:"Delay before present/not present", required: true, defaultValue: null)
-				input(name: "minSec", type: "bool", title: "Off = Seconds - On = Minutes", required: true, defaultValue: false)
-		}
-		//}
+		input(name: "secMin", type: "enum", title: "Seconds Or Minutes", required: true, defaultValue: "Seconds",
+			 options: ["Seconds", "minutes"])
+		input(name: "delayNum", type: "number", title:"Delay before active/inactive", required: true, defaultValue: 5)
 	 	input(name: "debugEnabled", type: "bool", title: "Enable debug logging", required:true,  defaultValue: false)          
 		}
 	} // end preferences
@@ -80,7 +80,7 @@ def removeLegacyState() {
 }
 
 def checkDelay(){
-    if (minSec == true) {
+    if (secMin == "Minutes") {
        state.delay1 = 60 * delayNum as int    
     }
     else{
@@ -91,7 +91,4 @@ def checkDelay(){
 
 
 
-private getVersion() {
-	"Virtual Heartbeat Motion Sensor 1.0"
-}
 
