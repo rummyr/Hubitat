@@ -16,9 +16,8 @@
  *
  */
 
-version = "1.1"
 private getVersion() {
-	"Virtual Heartbeat Presence " & version
+	"Virtual Heartbeat Presence 1.2"
 }
 
 metadata {
@@ -26,6 +25,7 @@ metadata {
     definition (name: "Virtual Heartbeat Presence", namespace: "rummyr", author: "Andrew Rowbottom", description: "A description!") {
 		capability "Sensor"
 		capability "PresenceSensor"
+		capability "Initialize"
 		
         command "notPresent"
 		command "present"
@@ -55,20 +55,24 @@ metadata {
 
 
 def present() {
+	if (debugEnabled) log.debug "$version - present() executing, presence is '$device.currentPresence'"
     checkDelay()
-    sendEvent(name: "presence", value: "present")
-	if (debugEnabled) log.debug "$version - present() executing"
-	
-    if(defaultState == "not present"){
-      if (debugEnabled) log.debug "$version - present going to not present in $state.delay1 seconds"
-      runIn(state.delay1, notPresent) // not doing [overwrite: false] because we want to effectively reset
-    } 
+	if (device.currentPresence != "present") { // keep the events sent down, as a heartbeat this repeatedly gets "present" called
+	    sendEvent(name: "presence", value: "present") 
+	}
+
+	if(defaultState == "not present"){
+	  if (debugEnabled) log.debug "$version - present going to not present in $state.delay1 seconds"
+	  runIn(state.delay1, notPresent) // not doing [overwrite: false] because we want to effectively reset
+	} 
 }
 
 def notPresent() {
+	if (debugEnabled) log.debug "$version - notPresent() executing, presence is '$device.currentPresence'"
     checkDelay()
-	if (debugEnabled) log.debug "$version - notPresent() executing"
-    sendEvent(name: "presence", value: "not present")
+	if (device.currentPresence != "not present") { // keep the events sent down, only send if changed
+	    sendEvent(name: "presence", value: "not present")
+	}
 
     if(defaultState == "present"){
       if (debugEnabled) log.debug "$version - not present going to present in $state.delay1 seconds"
@@ -89,6 +93,15 @@ def checkDelay(){
     }
 }
 
+// updated() runs every time user saves preferences
+def updated() {
+	log.info "updated() called, debug is ${debugEnabled}";
+}
+
+def initialize() {
+	log.info getVersion() + "init() called";
+	state.version = getVersion();
+}
 
 // for future work!
 private dbCleanUp() {
